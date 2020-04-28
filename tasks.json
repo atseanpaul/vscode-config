@@ -16,7 +16,7 @@
         {
             "type": "shell",
             "label": "kgdboc",
-            "command": "grep -qF -- 'kgdboc=ttyS0' config.txt || echo 'kgdboc=ttyS0' >> config.txt",
+            "command": "grep -qF -- 'kgdboc=${config:cros.board.kgdb_tty}' config.txt || echo 'kgdboc=${config:cros.board.kgdb_tty}' >> config.txt",
             "options": {
                 "cwd": "/${config:cros.src}/build/images/${config:cros.board.name}/latest/"
             },

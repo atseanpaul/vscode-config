@@ -9,14 +9,25 @@
         "editor.wordWrapColumn": 80
     },
     "cros": {
+	    // [outside_chroot] Root src directory of your cros checkout
         "src": "${env:HOME}/s/cros/src",
+	    // [outside_chroot] Directory of your cros chroot
         "chroot": "${env:HOME}/s/cros/chroot",
+	    // [outside_chroot] Path to the cros_sdk binary from depot_tools
         "cros_sdk": "${env:HOME}/bin/depot_tools/cros_sdk",
+	    // Board configuration for kgdb
         "board": {
+	        // Board name
             "name": "atlas",
+	        // Kernel version to build/debug
             "version": "4_4",
+	        // tty device to attach kgdb
+	        "kgdb_tty": "ttyS0",
+	        // [inside_chroot] Path to gdb binary from board's toolchain
             "gdb": "/usr/bin/x86_64-cros-linux-gnu-gdb",
+	        // IP address for the device
             "ip": "cros",
+	        // TTY of the CPU serial port from dut-control
             "cpu_tty": "/dev/pts/49"
         }
     }
