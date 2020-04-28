@@ -22,18 +22,6 @@
                 "traceResponse": false,
                 "engineLogging": false
             }
-        },
-        {
-            "name": "Build Kernel",
-            "type": "node",
-            "request": "launch",
-            "preLaunchTask": "emerge-kernel",
-        },
-        {
-            "name": "Update Kernel",
-            "type": "node",
-            "request": "launch",
-            "preLaunchTask": "update-kernel",
         }
     ]
 }

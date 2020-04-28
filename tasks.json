@@ -11,31 +11,33 @@
                 "emerge-${config:cros.board.name}",
                 "chromeos-kernel-${config:cros.board.version}"
             ],
+            "group": {
+                "kind": "build"
+            }
         },
-
         {
             "type": "shell",
             "label": "kgdboc",
             "command": "grep -qF -- 'kgdboc=${config:cros.board.kgdb_tty}' config.txt || echo 'kgdboc=${config:cros.board.kgdb_tty}' >> config.txt",
             "options": {
-                "cwd": "/${config:cros.src}/build/images/${config:cros.board.name}/latest/"
-            },
+                "cwd": "${config:cros.src}/build/images/${config:cros.board.name}/latest/"
+            }
         },
         {
             "type": "shell",
             "label": "kgdbcon",
             "command": "grep -qF -- 'kgdbcon' config.txt || echo 'kgdbcon' >> config.txt",
             "options": {
-                "cwd": "/${config:cros.src}/build/images/${config:cros.board.name}/latest/"
-            },
+                "cwd": "${config:cros.src}/build/images/${config:cros.board.name}/latest/"
+            }
         },
         {
             "type": "shell",
             "label": "nmi_watchdog",
             "command": "sed -i 's/nmi_watchdog=.*/nmi_watchdog=0/' config.txt",
             "options": {
-                "cwd": "/${config:cros.src}/build/images/${config:cros.board.name}/latest/"
-            },
+                "cwd": "${config:cros.src}/build/images/${config:cros.board.name}/latest/"
+            }
         },
         {
             "label": "kgdb bootargs",
@@ -45,7 +47,6 @@
                 "nmi_watchdog"
             ]
         },
-
         {
             "type": "shell",
             "label": "update-kernel",
@@ -56,11 +57,15 @@
                 "${config:cros.board.ip}"
             ],
             "options": {
-                "cwd": "/${config:cros.src}/scripts"
+                "cwd": "${config:cros.src}/scripts"
             },
             "dependsOn": [
                 "kgdb bootargs"
-            ]
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
         }
     ]
 }
