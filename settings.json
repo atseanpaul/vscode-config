@@ -1,0 +1,14 @@
+{
+    "cros": {
+        "src": "${env:HOME}/s/cros/src",
+        "chroot": "${env:HOME}/s/cros/chroot",
+        "cros_sdk": "${env:HOME}/bin/depot_tools/cros_sdk",
+        "board": {
+            "name": "atlas",
+            "version": "4_4",
+            "gdb": "/usr/bin/x86_64-cros-linux-gnu-gdb",
+            "ip": "cros",
+            "cpu_tty": "/dev/pts/49"
+        },
+    }
+}

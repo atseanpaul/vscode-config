@@ -1,0 +1,66 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "emerge-kernel",
+            "command": "${config:cros.cros_sdk}",
+            "args": [
+                "USE='kgdb vtconsole pcserial tty_console_ttyS0'",
+                "FEATURES='noclean'",
+                "emerge-${config:cros.board.name}",
+                "chromeos-kernel-${config:cros.board.version}"
+            ],
+        },
+
+        {
+            "type": "shell",
+            "label": "kgdboc",
+            "command": "grep -qF -- 'kgdboc=ttyS0' config.txt || echo 'kgdboc=ttyS0' >> config.txt",
+            "options": {
+                "cwd": "/${config:cros.src}/build/images/${config:cros.board.name}/latest/"
+            },
+        },
+        {
+            "type": "shell",
+            "label": "kgdbcon",
+            "command": "grep -qF -- 'kgdbcon' config.txt || echo 'kgdbcon' >> config.txt",
+            "options": {
+                "cwd": "/${config:cros.src}/build/images/${config:cros.board.name}/latest/"
+            },
+        },
+        {
+            "type": "shell",
+            "label": "nmi_watchdog",
+            "command": "sed -i 's/nmi_watchdog=.*/nmi_watchdog=0/' config.txt",
+            "options": {
+                "cwd": "/${config:cros.src}/build/images/${config:cros.board.name}/latest/"
+            },
+        },
+        {
+            "label": "kgdb bootargs",
+            "dependsOn": [
+                "kgdboc",
+                "kgdbcon",
+                "nmi_watchdog"
+            ]
+        },
+
+        {
+            "type": "shell",
+            "label": "update-kernel",
+            "command": "${config:cros.cros_sdk}",
+            "args": [
+                "./update_kernel.sh",
+                "--remote",
+                "${config:cros.board.ip}"
+            ],
+            "options": {
+                "cwd": "/${config:cros.src}/scripts"
+            },
+            "dependsOn": [
+                "kgdb bootargs"
+            ]
+        }
+    ]
+}

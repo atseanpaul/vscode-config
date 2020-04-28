@@ -1,0 +1,39 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Kernel",
+            "type": "crosgdb",
+            "request": "attach",
+            /* "debugServer": 4711, // Use this for debugging the code-debug extension */
+
+            "src_dir": "${config:cros.src}",
+            "cros_sdk_path": "${config:cros.cros_sdk}",
+            "gdbpath": "${config:cros.board.gdb}",
+            "executable": "/build/${config:cros.board.name}/usr/lib/debug/boot/vmlinux",
+            "target": "${config:cros.board.cpu_tty}",
+
+            "autorun": [],
+            "cacheThreads": true,
+            "showDevDebugOutput": false,
+            "printCalls": false,
+            "logging": {
+                "trace": false,
+                "traceResponse": false,
+                "engineLogging": false
+            }
+        },
+        {
+            "name": "Build Kernel",
+            "type": "node",
+            "request": "launch",
+            "preLaunchTask": "emerge-kernel",
+        },
+        {
+            "name": "Update Kernel",
+            "type": "node",
+            "request": "launch",
+            "preLaunchTask": "update-kernel",
+        }
+    ]
+}
