@@ -11,6 +11,7 @@
                 "emerge-${config:cros.board.name}",
                 "chromeos-kernel-${config:cros.board.version}"
             ],
+            "problemMatcher": "$gcc",
             "group": {
                 "kind": "build"
             }
@@ -62,6 +63,7 @@
             "dependsOn": [
                 "kgdb bootargs"
             ],
+            "problemMatcher": "",
             "group": {
                 "kind": "build",
                 "isDefault": false
