@@ -15,12 +15,16 @@
         "chroot": "${env:HOME}/s/cros/chroot",
 	    // [outside_chroot] Path to the cros_sdk binary from depot_tools
         "cros_sdk": "${env:HOME}/bin/depot_tools/cros_sdk",
+        // Name of the package to build with emerge-package
+        "package": "chromeos-installer",
+        // USE flags for building packages/images
+        "use_flags": "chrome_internal kgdb vtconsole pcserial",
 	    // Board configuration for kgdb
         "board": {
 	        // Board name
-            "name": "atlas",
+            "name": "hatch",
 	        // Kernel version to build/debug
-            "version": "4_4",
+            "version": "upstream",
 	        // tty device to attach kgdb
 	        "kgdb_tty": "ttyS0",
 	        // [inside_chroot] Path to gdb binary from board's toolchain
@@ -28,7 +32,26 @@
 	        // IP address for the device
             "ip": "cros",
 	        // TTY of the CPU serial port from dut-control
+            "cpu_tty": "/dev/pts/70"
+        },
+        "board_inactive": {
+            "name": "eve",
+            "version": "4_4",
+	        "kgdb_tty": "ttyS0",
+            "gdb": "/usr/bin/x86_64-cros-linux-gnu-gdb",
+            "ip": "cros",
+            "cpu_tty": "/dev/pts/49",
+        },
+        "board_inactive": {
+            "name": "samus",
+            "version": "4_14",
+	        "kgdb_tty": "ttyS1",
+            "gdb": "/usr/bin/x86_64-cros-linux-gnu-gdb",
+            "ip": "cros",
             "cpu_tty": "/dev/pts/49"
-        }
+        },
+    },
+    "files.associations": {
+        "types.h": "c"
     }
 }

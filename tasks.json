@@ -6,15 +6,163 @@
             "label": "emerge-kernel",
             "command": "${config:cros.cros_sdk}",
             "args": [
-                "USE='kgdb vtconsole pcserial tty_console_ttyS0'",
+                "USE=${config:cros.use_flags} tty_console_${config:cros.board.kgdb_tty}",
                 "FEATURES='noclean'",
                 "emerge-${config:cros.board.name}",
+                "--nodeps"
                 "chromeos-kernel-${config:cros.board.version}"
             ],
             "problemMatcher": "$gcc",
             "group": {
                 "kind": "build"
             }
+        },
+        {
+            "type": "shell",
+            "label": "build_compile_commands",
+            "command": "${config:cros.cros_sdk}",
+            "args": [
+                "USE=clang compilation_database",
+                "FEATURES='noclean'",
+                "emerge-${config:cros.board.name}",
+                "--nodeps"
+                "chromeos-kernel-${config:cros.board.version}"
+            ],
+            "problemMatcher": "$gcc",
+        },
+        {
+            "type": "shell",
+            "label": "gen_compile_commands",
+            "command": "cp",
+            "args": [
+                "${config:cros.chroot}/build/${config:cros.board.name}/build/kernel/compile_commands_no_chroot.json",
+                "${workspaceFolder}/compile_commands.json"
+            ],
+            "problemMatcher": "$gcc",
+            "group": {
+                "kind": "build"
+            },
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "build_compile_commands",
+            ]
+        },
+        {
+            "type": "shell",
+            "label": "workon-package",
+            "command": "${config:cros.cros_sdk}",
+            "args": [
+                "cros_workon",
+                "--board",
+                "${config:cros.board.name}",
+                "start",
+                "${config:cros.package}"
+            ],
+            "problemMatcher": "$gcc",
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "emerge-package",
+            "command": "${config:cros.cros_sdk}",
+            "args": [
+                "emerge-${config:cros.board.name}",
+                "${config:cros.package}"
+            ],
+            "problemMatcher": "$gcc",
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "deploy-package",
+            "command": "${config:cros.cros_sdk}",
+            "args": [
+                "cros",
+                "deploy",
+                "${config:cros.board.ip}",
+                "${config:cros.package}"
+            ],
+            "problemMatcher": "$gcc",
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "remote-command",
+            "command": "cros_connect",
+            "args": [
+                "root@${config:cros.board.ip}"
+                "${input:remote_command}",
+            ],
+            "problemMatcher": "$gcc",
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "build_packages",
+            "command": "${config:cros.cros_sdk}",
+            "args": [
+                "USE=${config:cros.use_flags} tty_console_${config:cros.board.kgdb_tty}",
+                "./build_packages",
+                "--board",
+                "${config:cros.board.name}",
+                "--autosetgov",
+                "--nowithautotest"
+            ],
+            "options": {
+                "cwd": "${config:cros.src}/scripts"
+            },
+            "group": {
+                "kind": "build"
+            },
+            "problemMatcher": []
+        },
+        {
+            "type": "shell",
+            "label": "build_image",
+            "command": "${config:cros.cros_sdk}",
+            "args": [
+                "USE=${config:cros.use_flags} tty_console_${config:cros.board.kgdb_tty}",
+                "./build_image",
+                "--board",
+                "${config:cros.board.name}",
+                "--enable_serial",
+                "${config:cros.board.kgdb_tty}",
+                "--noenable_rootfs_verification",
+                "test"
+            ],
+            "options": {
+                "cwd": "${config:cros.src}/scripts"
+            },
+            "group": {
+                "kind": "build"
+            },
+            "problemMatcher": []
+        },
+        {
+            "type": "shell",
+            "label": "flash_usb",
+            "command": "${config:cros.cros_sdk}",
+            "args": [
+                "cros",
+                "flash",
+                "usb://",
+                "../build/images/${config:cros.board.name}/latest/chromiumos_test_image.bin"
+            ],
+            "options": {
+                "cwd": "${config:cros.src}/scripts"
+            },
+            "group": {
+                "kind": "build"
+            },
+            "problemMatcher": []
         },
         {
             "type": "shell",
@@ -42,6 +190,7 @@
         },
         {
             "label": "kgdb bootargs",
+            "dependsOrder": "sequence",
             "dependsOn": [
                 "kgdboc",
                 "kgdbcon",
@@ -69,5 +218,23 @@
                 "isDefault": false
             }
         }
-    ]
+    ],
+    "inputs": [
+        {
+          "id": "remote_command",
+          "type": "pickString",
+          "description": "What command do you want to run? (Enter for shell)",
+          "options": [
+            "",
+            "restart ui",
+            "cat /sys/kernel/debug/dri/trace",
+            "reboot",
+            "mount -o remount,rw /",
+            "chromeos-install --yes",
+            "modetest -c"
+          ],
+          "default": ""
+          // type specific configuration attributes
+        }
+      ]
 }
