@@ -6,19 +6,18 @@
         "editor.tabSize": 8,
         "editor.rulers": [80],
         "editor.wordWrap": "wordWrapColumn",
-        "editor.wordWrapColumn": 80
+        "editor.wordWrapColumn": 100,
     },
     "cros": {
 	    // [outside_chroot] Root src directory of your cros checkout
-        "src": "${env:HOME}/s/cros/src",
+        "src": "${env:HOME}/s/chromeos/src",
 	    // [outside_chroot] Directory of your cros chroot
-        "chroot": "${env:HOME}/s/cros/chroot",
+        "chroot": "${env:HOME}/s/chromeos/chroot",
 	    // [outside_chroot] Path to the cros_sdk binary from depot_tools
         "cros_sdk": "${env:HOME}/bin/depot_tools/cros_sdk",
-        // Name of the package to build with emerge-package
-        "package": "chromeos-installer",
         // USE flags for building packages/images
-        "use_flags": "chrome_internal kgdb vtconsole pcserial",
+        "use_flags": "chrome_internal pcserial vtconsole", //kgdb lockdebug",
+
 	    // Board configuration for kgdb
         "board": {
 	        // Board name
@@ -52,6 +51,7 @@
         },
     },
     "files.associations": {
-        "types.h": "c"
-    }
+        "*.h": "c"
+    },
+    "restructuredtext.confPath": "${workspaceFolder}/Documentation"
 }

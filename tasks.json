@@ -6,7 +6,7 @@
             "label": "emerge-kernel",
             "command": "${config:cros.cros_sdk}",
             "args": [
-                "USE=${config:cros.use_flags} tty_console_${config:cros.board.kgdb_tty}",
+                "USE='${config:cros.use_flags} tty_console_${config:cros.board.kgdb_tty}'",
                 "FEATURES='noclean'",
                 "emerge-${config:cros.board.name}",
                 "--nodeps"
@@ -56,7 +56,7 @@
                 "--board",
                 "${config:cros.board.name}",
                 "start",
-                "${config:cros.package}"
+                "${input:package_name}"
             ],
             "problemMatcher": "$gcc",
             "group": {
@@ -65,11 +65,41 @@
         },
         {
             "type": "shell",
-            "label": "emerge-package",
+            "label": "workon-package stop",
+            "command": "${config:cros.cros_sdk}",
+            "args": [
+                "cros_workon",
+                "--board",
+                "${config:cros.board.name}",
+                "stop",
+                "${input:package_name}"
+            ],
+            "problemMatcher": "$gcc",
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "emerge package",
             "command": "${config:cros.cros_sdk}",
             "args": [
                 "emerge-${config:cros.board.name}",
-                "${config:cros.package}"
+                "${input:package_name}"
+            ],
+            "problemMatcher": "$gcc",
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "purge package",
+            "command": "${config:cros.cros_sdk}",
+            "args": [
+                "emerge-${config:cros.board.name}",
+                "-C",
+                "${input:package_name}"
             ],
             "problemMatcher": "$gcc",
             "group": {
@@ -84,7 +114,7 @@
                 "cros",
                 "deploy",
                 "${config:cros.board.ip}",
-                "${config:cros.package}"
+                "${input:package_name}"
             ],
             "problemMatcher": "$gcc",
             "group": {
@@ -114,7 +144,8 @@
                 "--board",
                 "${config:cros.board.name}",
                 "--autosetgov",
-                "--nowithautotest"
+                "--nowithautotest",
+                "--internal"
             ],
             "options": {
                 "cwd": "${config:cros.src}/scripts"
@@ -203,6 +234,7 @@
             "command": "${config:cros.cros_sdk}",
             "args": [
                 "./update_kernel.sh",
+                "--clean",
                 "--remote",
                 "${config:cros.board.ip}"
             ],
@@ -210,14 +242,62 @@
                 "cwd": "${config:cros.src}/scripts"
             },
             "dependsOn": [
-                "kgdb bootargs"
+                //"kgdb bootargs"
             ],
             "problemMatcher": "",
             "group": {
                 "kind": "build",
                 "isDefault": false
             }
-        }
+        },
+        {
+            "type": "shell",
+            "label": "update-kernel device",
+            "command": "${config:cros.cros_sdk}",
+            "args": [
+                "./update_kernel.sh",
+                "--remote",
+                "${config:cros.board.ip}",
+                "--device",
+                "${input:root_device}",
+                "--partition",
+                "${input:root_device}2",
+                "--rootfs",
+                "${input:root_device}3",
+            ],
+            "options": {
+                "cwd": "${config:cros.src}/scripts"
+            },
+            "dependsOn": [
+                //"kgdb bootargs"
+            ],
+            "problemMatcher": "",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "type": "shell",
+            "label": "function to line",
+            "command": "${config:cros.cros_sdk}",
+            "args": [
+                "${config:cros.board.gdb}"
+                "--eval-command",
+                "l *${input:func_offset}",
+                "--eval-command",
+                "quit",
+                "/build/${config:cros.board.name}/usr/lib/debug/boot/vmlinux"
+            ],
+            "options": {
+                "cwd": "${config:cros.src}/scripts"
+            },
+            "problemMatcher": "",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
     ],
     "inputs": [
         {
@@ -228,13 +308,48 @@
             "",
             "restart ui",
             "cat /sys/kernel/debug/dri/trace",
+            "cat /sys/kernel/debug/tracing/instances/drm/trace",
             "reboot",
             "mount -o remount,rw /",
             "chromeos-install --yes",
-            "modetest -c"
+            "modetest -c",
+            "/usr/share/vboot/bin/make_dev_ssd.sh --remove_rootfs_verification --partitions 2"
           ],
           "default": ""
           // type specific configuration attributes
+        },
+        {
+          "id": "root_device",
+          "type": "pickString",
+          "description": "What device do you want to update?",
+          "options": [
+            "/dev/mmcblk0p",
+            "/dev/nvme0n1p",
+            "/dev/sda",
+            "/dev/mmcblk1p",
+          ],
+          "default": "/dev/mmcblk0p",
+        },
+        {
+          "id": "package_name",
+          "type": "pickString",
+          "description": "What package do you want to use?",
+          "options": [
+            "chromeos-kernel-4_4",
+            "chromeos-kernel-4_14",
+            "chromeos-kernel-4_19",
+            "chromeos-kernel-5_4",
+            "chromeos-kernel-upstream",
+            "debugd",
+            "chromeos-login"
+          ],
+          "default": ""
+        },
+        {
+          "id": "func_offset",
+          "type": "promptString",
+          "description": "Enter the function and offset (format: func+offset)",
+          "default": ""
         }
       ]
 }
