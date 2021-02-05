@@ -136,6 +136,23 @@
         },
         {
             "type": "shell",
+            "label": "setup_board",
+            "command": "${config:cros.cros_sdk}",
+            "args": [
+                "setup_board",
+                "--board",
+                "${config:cros.board.name}",
+            ],
+            "options": {
+                "cwd": "${config:cros.src}/scripts"
+            },
+            "group": {
+                "kind": "build"
+            },
+            "problemMatcher": []
+        },
+        {
+            "type": "shell",
             "label": "build_packages",
             "command": "${config:cros.cros_sdk}",
             "args": [
@@ -186,6 +203,24 @@
                 "flash",
                 "usb://",
                 "../build/images/${config:cros.board.name}/latest/chromiumos_test_image.bin"
+            ],
+            "options": {
+                "cwd": "${config:cros.src}/scripts"
+            },
+            "group": {
+                "kind": "build"
+            },
+            "problemMatcher": []
+        },
+        {
+            "type": "shell",
+            "label": "flash_usb xbuddy",
+            "command": "${config:cros.cros_sdk}",
+            "args": [
+                "cros",
+                "flash",
+                "usb://",
+                "xbuddy://remote/${config:cros.board.name}/latest-canary/test"
             ],
             "options": {
                 "cwd": "${config:cros.src}/scripts"
@@ -339,9 +374,11 @@
             "chromeos-kernel-4_14",
             "chromeos-kernel-4_19",
             "chromeos-kernel-5_4",
+            "chromeos-kernel-5_10",
             "chromeos-kernel-upstream",
             "debugd",
-            "chromeos-login"
+            "chromeos-login",
+            "minigbm"
           ],
           "default": ""
         },
