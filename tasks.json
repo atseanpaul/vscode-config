@@ -7,9 +7,7 @@
             "command": "${config:cros.cros_sdk}",
             "args": [
                 "USE='${config:cros.use_flags} tty_console_${config:cros.board.kgdb_tty}'",
-                "FEATURES='noclean'",
                 "emerge-${config:cros.board.name}",
-                "--nodeps"
                 "chromeos-kernel-${config:cros.board.version}"
             ],
             "problemMatcher": "$gcc",
@@ -161,8 +159,7 @@
                 "--board",
                 "${config:cros.board.name}",
                 "--autosetgov",
-                "--nowithautotest",
-                "--internal"
+                "--internal",
             ],
             "options": {
                 "cwd": "${config:cros.src}/scripts"
@@ -229,6 +226,48 @@
                 "kind": "build"
             },
             "problemMatcher": []
+        },
+        {
+            "type": "shell",
+            "label": "igt all",
+            "command": "${config:cros.cros_sdk}",
+            "args": [
+                "tast",
+                "run",
+                "${config:cros.board.ip}",
+                "graphics.IGT.*"
+            ],
+            "options": {
+                "cwd": "${config:cros.src}/scripts"
+            },
+            "dependsOn": [
+            ],
+            "problemMatcher": "",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "type": "shell",
+            "label": "igt single",
+            "command": "${config:cros.cros_sdk}",
+            "args": [
+                "tast",
+                "run",
+                "${config:cros.board.ip}",
+                "graphics.IGT.${input:igt_subtest}",
+            ],
+            "options": {
+                "cwd": "${config:cros.src}/scripts"
+            },
+            "dependsOn": [
+            ],
+            "problemMatcher": "",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
         },
         {
             "type": "shell",
@@ -376,9 +415,12 @@
             "chromeos-kernel-5_4",
             "chromeos-kernel-5_10",
             "chromeos-kernel-upstream",
-            "debugd",
             "chromeos-login",
-            "minigbm"
+            "debugd",
+            "igt-gpu-tools",
+            "libva-intel-media-driver-pavp",
+            "linux-firmware",
+            "minigbm",
           ],
           "default": ""
         },
@@ -387,6 +429,13 @@
           "type": "promptString",
           "description": "Enter the function and offset (format: func+offset)",
           "default": ""
+        },
+        {
+          "id": "igt_subtest",
+          "type": "promptString",
+          "description": "Enter the subtest (graphics.IGT.<input>)",
+          "default": ""
         }
+
       ]
 }
