@@ -23,7 +23,7 @@
                 "USE=clang compilation_database",
                 "FEATURES='noclean'",
                 "emerge-${config:cros.board.name}",
-                "--nodeps"
+                "--nodeps",
                 "chromeos-kernel-${config:cros.board.version}"
             ],
             "problemMatcher": "$gcc",
@@ -111,7 +111,7 @@
             "args": [
                 "cros",
                 "deploy",
-                "${config:cros.board.ip}",
+                "${config:cros.dut_ip}:${config:cros.dut_port}",
                 "${input:package_name}"
             ],
             "problemMatcher": "$gcc",
@@ -122,9 +122,10 @@
         {
             "type": "shell",
             "label": "remote-command",
-            "command": "cros_connect",
+            "command": "${env:HOME}/bin/cros_connect",
             "args": [
-                "root@${config:cros.board.ip}"
+                "root@${config:cros.dut_ip}",
+                "-p ${config:cros.dut_port}",
                 "${input:remote_command}",
             ],
             "problemMatcher": "$gcc",
@@ -234,7 +235,7 @@
             "args": [
                 "tast",
                 "run",
-                "${config:cros.board.ip}",
+                "${config:cros.dut_ip}:${config:cros.dut_port}",
                 "graphics.IGT.*"
             ],
             "options": {
@@ -255,7 +256,7 @@
             "args": [
                 "tast",
                 "run",
-                "${config:cros.board.ip}",
+                "${config:cros.dut_ip}:${config:cros.dut_port}",
                 "graphics.IGT.${input:igt_subtest}",
             ],
             "options": {
@@ -310,7 +311,9 @@
                 "./update_kernel.sh",
                 "--clean",
                 "--remote",
-                "${config:cros.board.ip}"
+                "${config:cros.dut_ip}",
+                "--ssh_port",
+                "${config:cros.dut_port}"
             ],
             "options": {
                 "cwd": "${config:cros.src}/scripts"
@@ -331,7 +334,9 @@
             "args": [
                 "./update_kernel.sh",
                 "--remote",
-                "${config:cros.board.ip}",
+                "${config:cros.dut_ip}",
+                "--ssh_port",
+                "${config:cros.dut_port}",
                 "--device",
                 "${input:root_device}",
                 "--partition",
@@ -356,7 +361,7 @@
             "label": "function to line",
             "command": "${config:cros.cros_sdk}",
             "args": [
-                "${config:cros.board.gdb}"
+                "${config:cros.board.gdb}",
                 "--eval-command",
                 "l *${input:func_offset}",
                 "--eval-command",
